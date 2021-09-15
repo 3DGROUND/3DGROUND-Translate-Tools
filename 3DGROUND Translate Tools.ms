@@ -1,3 +1,13 @@
+/*
+	Translate Tools
+	
+	Versin: 1.0.1
+	MastaMan
+	https://3dground.net
+	
+	3DGROUND
+*/
+
 try(closeRolloutFloater fTranslates) catch()
 global fTranslates = newRolloutFloater "3DGROUND Translate Tools" 1400 877
 global _rTranslatesUI
@@ -54,7 +64,7 @@ fn getScriptsFromInstalled = (
 
 	lngScripts = #()
 	struct ln (script, files)
-
+	
 	for i in 1 to d.count where doesFileExist (d[i] + "english.lng") do (
 		lngScripts[i] = #()
 		pp = filterString d[i]	@"\"
@@ -81,11 +91,12 @@ fn getTranslateFiles = (
 		j = getScriptsFromInstalled()
 		if(j.count > 0 and ddl != undefined and ddl.items.count == 0) do (
 			ddl.enabled = true
-			ddl.items = for i in j collect i.script
+			
+			ddl.items = for i in j where i != undefined collect i.script
 		)
 		
 		if(ddl.items.count > 0) do (
-			for i in j where ddl.selected == i.script do return i.files
+			for i in j where i != undefined and ddl.selected == i.script do return i.files
 		)
 	)
 	
