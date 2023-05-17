@@ -1,7 +1,7 @@
 /*
 	Translate Tools
 	
-	Versin: 1.0.1
+	Versin: 1.0.2
 	MastaMan
 	https://3dground.net
 	
@@ -18,6 +18,8 @@ fn httpGet url =
 	url += "&time=" + (timeStamp() as string)
 	try
 	(
+		spm = dotNetClass "System.Net.ServicePointManager"
+		spm.SecurityProtocol = spm.SecurityProtocol.TLS12	
 		w = dotNetObject (dotNetClass "System.Net.WebClient")
 		s = dotNetClass "System.IO.StreamReader"
 		o = w.OpenRead url
@@ -105,6 +107,16 @@ fn getTranslateFiles = (
 
 fn getTranslatesNames = (
 	for f in getTranslateFiles() where (getIniSetting f "INDEX" "TYPE") == "dictionary" collect getIniSetting f "INDEX" "NAME"
+)
+
+fn getTranslateSections = (
+	local o = #()
+	
+	for f in getTranslateFiles() do (		
+		for s in (getIniSetting f) where s != "INDEX" do appendIfUnique o s
+	)
+
+	return o
 )
 
 fn getListUniqueKeys sec: "UI"= (
@@ -617,7 +629,10 @@ rollout _rTranslatesUI "Translate Tools" category: 1 (
 	timer trmFilter "Timer Filter" active: false interval: 300
 	
 	fn init = (
-		initDotNet lbxTranslatesUI		
+		initDotNet lbxTranslatesUI	
+		
+		ddlSecType.items = getTranslateSections()
+		
 		s = ddlSecType.selected 		
 		buildList lbxTranslatesUI sec: s
 	)
